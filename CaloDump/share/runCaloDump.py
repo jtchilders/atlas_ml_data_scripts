@@ -66,7 +66,7 @@ theJob = AlgSequence()
 # Number of Events to process
 theApp.EvtMax = -1
 
-from CaloMon.CaloMonConf import MyAlg
+from CaloDump.CaloDumpConf import MyAlg
 theJob += MyAlg( OutputLevel = VERBOSE )
 
 # energy thresholds 
