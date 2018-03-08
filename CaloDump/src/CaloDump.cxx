@@ -1,4 +1,4 @@
-#include "CaloMon/MyAlg.h"
+#include "CaloDump/CaloDump.h"
 
 #include "GaudiKernel/MsgStream.h"
 #include "GaudiKernel/ISvcLocator.h"

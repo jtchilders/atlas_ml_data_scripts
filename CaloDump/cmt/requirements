@@ -1,4 +1,4 @@
-package CaloMon
+package CaloDump
 
 author Jordan Webster <jordan.s.webster@cern.ch>
 
@@ -29,10 +29,9 @@ use xAODJet              xAODJet-*           Event/xAOD
 end_private
 
 apply_pattern component_library
-apply_pattern declare_joboptions files="runMyAlg.py"
+apply_pattern declare_joboptions files="runCaloDump.py"
 apply_pattern generic_declare_for_link kind=json files="../share/$(package)Signatures.json" prefix=share/JobTransforms
 apply_pattern declare_runtime files="*.dat"
 
-library CaloMon *.cxx -s=components *.cxx
-
+library CaloDump *.cxx -s=components *.cxx
 
