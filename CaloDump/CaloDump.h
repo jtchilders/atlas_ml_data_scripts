@@ -66,6 +66,8 @@ private:
   
   unsigned short int m_run_number;
   unsigned int m_event_number;
+  unsigned int m_lumi_block;
+  unsigned int m_time_stamp;
 
   unsigned int m_n_truthparticles;
   std::vector<short int> m_particle_id;
@@ -125,7 +127,9 @@ private:
   unsigned int m_lar_n_cells;
   std::vector<float> m_lar_cell_x,m_lar_cell_y,m_lar_cell_z,m_lar_cell_Et;
   std::vector<float> m_lar_cell_eta,m_lar_cell_phi;
-  std::vector<bool> m_lar_cell_bad;
+  std::vector<bool> m_lar_cell_bad,m_lar_is_em,m_lar_is_em_barrel,
+                    m_lar_is_em_endcap,m_lar_is_em_endcap_inner,
+                    m_lar_is_em_endcap_outer,m_lar_is_hec,m_lar_is_fcal;
   std::vector<short int> m_lar_barrel_ec,m_lar_sampling,m_lar_region,m_lar_eta,m_lar_phi;
  /**
   * 0150    * return neg_pos according to : <br>

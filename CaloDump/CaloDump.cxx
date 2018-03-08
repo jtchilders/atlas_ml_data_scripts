@@ -74,6 +74,8 @@ StatusCode MyAlg::initialize(){
 
   m_roottree->Branch("run_number",&m_run_number,"run_number/s");
   m_roottree->Branch("event_number",&m_event_number,"event_number/I");
+  m_roottree->Branch("lumi_block",&m_lumi_block,"lumi_block/I");
+  m_roottree->Branch("time_stamp",&m_time_stamp,"time_stamp/I");
 
 
   m_roottree->Branch("n_truthparticles",&m_n_truthparticles,"n_truthparticles/I");
@@ -116,6 +118,13 @@ StatusCode MyAlg::initialize(){
   m_roottree->Branch("lar_region","vector<short>",&m_lar_region);
   m_roottree->Branch("lar_hw_eta","vector<short>",&m_lar_eta);
   m_roottree->Branch("lar_hw_phi","vector<short>",&m_lar_phi);
+  m_roottree->Branch("lar_is_em","vector<bool>",&m_lar_is_em);
+  m_roottree->Branch("lar_is_em_barrel","vector<bool>",&m_lar_is_em_barrel);
+  m_roottree->Branch("lar_is_em_endcap","vector<bool>",&m_lar_is_em_endcap);
+  m_roottree->Branch("lar_is_em_endcap_inner","vector<bool>",&m_lar_is_em_endcap_inner);
+  m_roottree->Branch("lar_is_em_endcap_outer","vector<bool>",&m_lar_is_em_endcap_outer);
+  m_roottree->Branch("lar_is_hec","vector<bool>",&m_lar_is_hec);
+  m_roottree->Branch("lar_is_fcal","vector<bool>",&m_lar_is_fcal);
   
   
   CHECK( service("StoreGateSvc", m_storeGate) );
@@ -208,6 +217,8 @@ StatusCode MyAlg::GetCells() {
   const EventID* evtid = eventInfo->event_ID();
   m_run_number = evtid->run_number();
   m_event_number = evtid->event_number();
+  m_lumi_block = evtid->lumi_block();
+  m_time_stamp = evtid->time_stamp();
   
   // Retrieve the xAOD truth objects
   //const xAOD::TruthEventAuxContainer* xTruthEventContainer = NULL;
@@ -351,6 +362,13 @@ StatusCode MyAlg::GetCells() {
   m_lar_region.clear();
   m_lar_eta.clear();
   m_lar_phi.clear();
+  m_lar_is_em.clear();
+  m_lar_is_em_barrel.clear();
+  m_lar_is_em_endcap.clear();
+  m_lar_is_em_endcap_inner.clear();
+  m_lar_is_em_endcap_outer.clear();
+  m_lar_is_hec.clear();
+  m_lar_is_fcal.clear();
 
 
   const  CaloCellContainer* cellCont = 0;
@@ -380,44 +398,50 @@ StatusCode MyAlg::GetCells() {
     
     
     //log << MSG::INFO << cell_ptr->x() << " " << cell_ptr->y() << " " << cell_ptr->z() << " " << cell_ptr->eta() << " " << cell_ptr->phi() << " " << (cell_ptr->energy()/GeV) << endreq;
-    if(m_caloCellHelper->is_tile(cellId) and cell_ptr->energy()/GeV > 0.1){ 
-      m_tile_n_cells++;
-      m_tile_cell_x.push_back(cell_ptr->x());
-      m_tile_cell_y.push_back(cell_ptr->y());
-      m_tile_cell_z.push_back(cell_ptr->z());
-      m_tile_cell_Et.push_back(cell_ptr->energy()/GeV*cell_ptr->sinTh());
-      m_tile_cell_eta.push_back(cell_ptr->eta());
-      m_tile_cell_phi.push_back(cell_ptr->phi());
-      m_tile_cell_bad.push_back(cell_ptr->badcell());
-      m_tile_section.push_back(m_caloCellHelper->section(cellId));
-      m_tile_module.push_back(m_caloCellHelper->module(cellId));
-      m_tile_tower.push_back(m_caloCellHelper->tower(cellId));
-      m_tile_sample.push_back(m_caloCellHelper->sample(cellId));
+    if(cell_ptr->energy()/GeV > 0.1){
+       if(m_caloCellHelper->is_tile(cellId)){ 
+         m_tile_n_cells++;
+         m_tile_cell_x.push_back(cell_ptr->x());
+         m_tile_cell_y.push_back(cell_ptr->y());
+         m_tile_cell_z.push_back(cell_ptr->z());
+         m_tile_cell_Et.push_back(cell_ptr->energy()/GeV*cell_ptr->sinTh());
+         m_tile_cell_eta.push_back(cell_ptr->eta());
+         m_tile_cell_phi.push_back(cell_ptr->phi());
+         m_tile_cell_bad.push_back(cell_ptr->badcell());
+         m_tile_section.push_back(m_caloCellHelper->section(cellId));
+         m_tile_module.push_back(m_caloCellHelper->module(cellId));
+         m_tile_tower.push_back(m_caloCellHelper->tower(cellId));
+         m_tile_sample.push_back(m_caloCellHelper->sample(cellId));
+       }
+       else{
+         m_lar_n_cells++;
+         /*std::cout << " lar: " << m_lar_n_cells << " " << cell_ptr->x() << " " << cell_ptr->y() << " " 
+                               << cell_ptr->z() << " " << (cell_ptr->energy()/GeV) << " " 
+                               << cell_ptr->eta() << " " << cell_ptr->phi() << " "
+                               << cell_ptr->badcell() << " " << m_caloCellHelper->pos_neg(cellId) << " "
+                               << m_caloCellHelper->sampling(cellId) << " " << m_caloCellHelper->region(cellId) << " "
+                               << m_caloCellHelper->eta(cellId) << " " << m_caloCellHelper->phi(cellId) << "\n";*/
+         m_lar_cell_x.push_back(cell_ptr->x());
+         m_lar_cell_y.push_back(cell_ptr->y());
+         m_lar_cell_z.push_back(cell_ptr->z());
+         m_lar_cell_Et.push_back(cell_ptr->energy()/GeV*cell_ptr->sinTh());
+         m_lar_cell_eta.push_back(cell_ptr->eta());
+         m_lar_cell_phi.push_back(cell_ptr->phi());
+         m_lar_cell_bad.push_back(cell_ptr->badcell());
+         m_lar_barrel_ec.push_back(m_caloCellHelper->pos_neg(cellId));
+         m_lar_sampling.push_back(m_caloCellHelper->sampling(cellId));
+         m_lar_region.push_back(m_caloCellHelper->region(cellId));
+         m_lar_eta.push_back(m_caloCellHelper->eta(cellId));
+         m_lar_phi.push_back(m_caloCellHelper->phi(cellId));
+         m_lar_is_em.push_back(m_caloCellHelper->is_em(cellId));
+         m_lar_is_em_barrel.push_back(m_caloCellHelper->is_em_barrel(cellId));
+         m_lar_is_em_endcap.push_back(m_caloCellHelper->is_em_endcap(cellId));
+         m_lar_is_em_endcap_inner.push_back(m_caloCellHelper->is_em_endcap_inner(cellId));
+         m_lar_is_em_endcap_outer.push_back(m_caloCellHelper->is_em_endcap_outer(cellId));
+         m_lar_is_hec.push_back(m_caloCellHelper->is_hec(cellId));
+         m_lar_is_fcal.push_back(m_caloCellHelper->is_fcal(cellId));
+       }
     }
-    else if((m_caloCellHelper->is_em_barrel(cellId) or
-            m_caloCellHelper->is_em_endcap(cellId)) and
-            cell_ptr->energy()/GeV > 0.1){
-      m_lar_n_cells++;
-      /*std::cout << " lar: " << m_lar_n_cells << " " << cell_ptr->x() << " " << cell_ptr->y() << " " 
-                            << cell_ptr->z() << " " << (cell_ptr->energy()/GeV) << " " 
-                            << cell_ptr->eta() << " " << cell_ptr->phi() << " "
-                            << cell_ptr->badcell() << " " << m_caloCellHelper->pos_neg(cellId) << " "
-                            << m_caloCellHelper->sampling(cellId) << " " << m_caloCellHelper->region(cellId) << " "
-                            << m_caloCellHelper->eta(cellId) << " " << m_caloCellHelper->phi(cellId) << "\n";*/
-      m_lar_cell_x.push_back(cell_ptr->x());
-      m_lar_cell_y.push_back(cell_ptr->y());
-      m_lar_cell_z.push_back(cell_ptr->z());
-      m_lar_cell_Et.push_back(cell_ptr->energy()/GeV*cell_ptr->sinTh());
-      m_lar_cell_eta.push_back(cell_ptr->eta());
-      m_lar_cell_phi.push_back(cell_ptr->phi());
-      m_lar_cell_bad.push_back(cell_ptr->badcell());
-      m_lar_barrel_ec.push_back(m_caloCellHelper->pos_neg(cellId));
-      m_lar_sampling.push_back(m_caloCellHelper->sampling(cellId));
-      m_lar_region.push_back(m_caloCellHelper->region(cellId));
-      m_lar_eta.push_back(m_caloCellHelper->eta(cellId));
-      m_lar_phi.push_back(m_caloCellHelper->phi(cellId));
-    }
-    
 
 /*
     if ( m_tileID->is_tile( cellId )) {
