@@ -1,35 +1,24 @@
 # ---------------------------------------------------------------------------------------------------
 # Testing a basic script to test "MyAlg" on an ESD file
 # ---------------------------------------------------------------------------------------------------
-
 from AthenaCommon.Constants import *
 from AthenaCommon.AppMgr import theApp
 from AthenaCommon.AppMgr import ServiceMgr
 from AthenaCommon.GlobalFlags  import globalflags
 import AthenaPoolCnvSvc.ReadAthenaPool
-from RecExConfig.RecFlags import rec
 import glob
 
 from AthenaCommon.DetFlags import DetFlags
-DetFlags.all_setOff()
-DetFlags.Calo_setOn()
-DetFlags.Tile_setOn()
-DetFlags.LAr_setOn()
+DetFlags.detdescr.ID_setOff()
+DetFlags.detdescr.Calo_setOn()
+DetFlags.detdescr.Tile_setOn()
+DetFlags.detdescr.Muon_setOff()
 
 globalflags.ConditionsTag = 'OFLCOND-MC15c-SDR-09'
 globalflags.DetDescrVersion = 'ATLAS-R2-2015-03-01-00'
 
-rec.doTruth = True
-rec.doLArg = True
-rec.doTile = True
-rec.doCalo = True
-rec.doMuon = False
-rec.doLucid = False
-
-include( "RecExCond/RecExCommon_flags.py" )
 
 include ("RecExCond/AllDet_detDescr.py")
-include( "IOVDbSvc/IOVRecExCommon.py" )
 
 #from G4AtlasApps.SimFlags import SimFlags
 #SimFlags.SimLayout = 'ATLAS-R2-2015-02-01-00' # 'ATLAS-GEO-16-00-00' # 'ATLAS-CSC-02-02-00'
@@ -54,7 +43,7 @@ include( "IOVDbSvc/IOVRecExCommon.py" )
 
 #filelist = glob.glob('/users/hpcusers/dumpCaloCells/reco_condor_job/ESD.*')
 
-#filelist = glob.glob('/grid/atlas/hpc/mldata/mc15_13TeV.361702.AlpgenPythiaEvtGen_P2012_ZeeNp2.simul.ESD/*')
+#filelist = glob.glob('/lcrc/group/ATLAS/atlasfs/local/rwang/ML/mldata/mc15_13TeV.361702.AlpgenPythiaEvtGen_P2012_ZeeNp2.simul.ESD/ESD.07354230._000001.pool.root.1')
 
 print 'filelist = ',len(filelist)
 
@@ -67,7 +56,8 @@ theJob = AlgSequence()
 theApp.EvtMax = -1
 
 from CaloMon.CaloMonConf import MyAlg
-theJob += MyAlg( OutputLevel = VERBOSE )
+#theJob += MyAlg( OutputLevel = VERBOSE )
+theJob += MyAlg( OutputLevel = INFO )
 
 # energy thresholds 
 MyAlg.energyThreshold = 0.3 # in GeV 

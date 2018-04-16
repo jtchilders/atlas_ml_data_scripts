@@ -16,6 +16,7 @@ use TileIdentifier       TileIdentifier-*      	TileCalorimeter
 use TileConditions       TileConditions-*      	TileCalorimeter
 use AtlasROOT            AtlasROOT-*         External
 
+
 private
 
 use AthContainers        AthContainers-*        Control
@@ -26,10 +27,17 @@ use TileEvent            TileEvent-*         TileCalorimeter
 use EventInfo            EventInfo-*         Event
 use xAODJet              xAODJet-*           Event/xAOD
 
+use InDetRawData    InDetRawData-*    InnerDetector/InDetRawEvent
+use InDetIdentifier InDetIdentifier-* InnerDetector/InDetDetDescr
+
+use InDetReadoutGeometry InDetReadoutGeometry-*    InnerDetector/InDetDetDescr
+use GeoModelInterfaces   GeoModelInterfaces-*      DetectorDescription/GeoModel
+use GeoPrimitives          GeoPrimitives-*        DetectorDescription
+
 end_private
 
 apply_pattern component_library
-apply_pattern declare_joboptions files="runMyAlg.py"
+apply_pattern declare_joboptions files="*.py"
 apply_pattern generic_declare_for_link kind=json files="../share/$(package)Signatures.json" prefix=share/JobTransforms
 apply_pattern declare_runtime files="*.dat"
 
