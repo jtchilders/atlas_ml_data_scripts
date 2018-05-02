@@ -16,9 +16,10 @@
 #include "TileEvent/TileCellContainer.h"
 
 #include "CaloIdentifier/CaloID.h"
-#include "CaloDetDescr/CaloDetDescrManager.h"
 #include "CaloEvent/CaloCell.h"
 #include "CaloEvent/CaloCellContainer.h"
+#include "CaloDetDescr/CaloDetDescrManager.h"
+#include "CaloDetDescr/CaloDetDescrElement.h"
 
 #include "xAODTruth/TruthEvent.h"
 #include "xAODTruth/TruthVertex.h"
@@ -104,6 +105,9 @@ StatusCode MyAlg::initialize(){
   m_roottree->Branch("tile_module","vector<short>",&m_tile_module);
   m_roottree->Branch("tile_tower","vector<short>",&m_tile_tower);
   m_roottree->Branch("tile_sample","vector<short>",&m_tile_sample);
+  m_roottree->Branch("tile_dphi","vector<float>",&m_tile_cell_dphi);
+  m_roottree->Branch("tile_deta","vector<float>",&m_tile_cell_deta);
+  m_roottree->Branch("tile_dr","vector<float>",&m_tile_cell_dr);
 
   m_roottree->Branch("lar_n_cells",&m_lar_n_cells,"lar_n_cells/I");
   m_roottree->Branch("lar_x","vector<float>",&m_lar_cell_x);
@@ -125,6 +129,9 @@ StatusCode MyAlg::initialize(){
   m_roottree->Branch("lar_is_em_endcap_outer","vector<bool>",&m_lar_is_em_endcap_outer);
   m_roottree->Branch("lar_is_hec","vector<bool>",&m_lar_is_hec);
   m_roottree->Branch("lar_is_fcal","vector<bool>",&m_lar_is_fcal);
+  m_roottree->Branch("lar_dphi","vector<float>",&m_lar_cell_dphi);
+  m_roottree->Branch("lar_deta","vector<float>",&m_lar_cell_deta);
+  m_roottree->Branch("lar_dr","vector<float>",&m_lar_cell_dr);
   
   
   CHECK( service("StoreGateSvc", m_storeGate) );
@@ -163,7 +170,6 @@ StatusCode MyAlg::initialize(){
     log << MSG::ERROR << "Could not access CaloCell_ID helper" << endreq;
     return StatusCode::FAILURE;
   }
-
 
   return StatusCode::SUCCESS;
 
@@ -348,6 +354,9 @@ StatusCode MyAlg::GetCells() {
   m_tile_module.clear();
   m_tile_tower.clear();
   m_tile_sample.clear();
+  m_tile_cell_dphi.clear();
+  m_tile_cell_deta.clear();
+  m_tile_cell_dr.clear();
 
   m_lar_n_cells = 0;
   m_lar_cell_x.clear();
@@ -369,6 +378,9 @@ StatusCode MyAlg::GetCells() {
   m_lar_is_em_endcap_outer.clear();
   m_lar_is_hec.clear();
   m_lar_is_fcal.clear();
+  m_lar_cell_dphi.clear();
+  m_lar_cell_deta.clear();
+  m_lar_cell_dr.clear();
 
 
   const  CaloCellContainer* cellCont = 0;
@@ -395,7 +407,8 @@ StatusCode MyAlg::GetCells() {
     const CaloCell* cell_ptr = *iCell;     // pointer to cell object
     const Identifier cellId = cell_ptr->ID();
 
-    
+    const CaloDetDescrElement* element=m_caloMgr->get_element (cellId);
+    log << MSG::DEBUG  << " Lar cell dphi (mm) = " << element->dphi()/CLHEP::mm << ", deta (mm) = " << element->deta()/CLHEP::mm << ", dr (mm) = " << element->dr()/CLHEP::mm << endreq;
     
     //log << MSG::INFO << cell_ptr->x() << " " << cell_ptr->y() << " " << cell_ptr->z() << " " << cell_ptr->eta() << " " << cell_ptr->phi() << " " << (cell_ptr->energy()/GeV) << endreq;
     if(cell_ptr->energy()/GeV > 0.1){
@@ -412,6 +425,9 @@ StatusCode MyAlg::GetCells() {
          m_tile_module.push_back(m_caloCellHelper->module(cellId));
          m_tile_tower.push_back(m_caloCellHelper->tower(cellId));
          m_tile_sample.push_back(m_caloCellHelper->sample(cellId));
+         m_tile_cell_dphi.push_back(element->dphi()/CLHEP::mm);
+         m_tile_cell_deta.push_back(element->deta()/CLHEP::mm);
+         m_tile_cell_dr.push_back(element->dr()/CLHEP::mm);
        }
        else{
          m_lar_n_cells++;
@@ -440,13 +456,17 @@ StatusCode MyAlg::GetCells() {
          m_lar_is_em_endcap_outer.push_back(m_caloCellHelper->is_em_endcap_outer(cellId));
          m_lar_is_hec.push_back(m_caloCellHelper->is_hec(cellId));
          m_lar_is_fcal.push_back(m_caloCellHelper->is_fcal(cellId));
+         m_lar_cell_dphi.push_back(element->dphi()/CLHEP::mm);
+         m_lar_cell_deta.push_back(element->deta()/CLHEP::mm);
+         m_lar_cell_dr.push_back(element->dr()/CLHEP::mm);
+         
        }
     }
 
 /*
     if ( m_tileID->is_tile( cellId )) {
 
-      const TileCell* tile_cell = dynamic_cast<const TileCell*> (cell_ptr);
+      const TileCell* tile_cell = detanamic_cast<const TileCell*> (cell_ptr);
       if (tile_cell!=0) {
         id = tile_cell->ID();
 

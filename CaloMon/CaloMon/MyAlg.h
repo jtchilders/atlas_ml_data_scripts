@@ -21,6 +21,8 @@
 #include "TFile.h"
 
 class CaloCell_ID;
+class CaloDetDescrManager;
+class CaloDetDescrElement;
 
 #include <string>
 #include <vector>
@@ -60,7 +62,7 @@ private:
   const TileHWID* m_tileHWID;
   const TileCablingService* m_cabling;
   const CaloCell_ID* m_caloCellHelper;
-  const CaloIdManager*  m_caloMgr;
+  const CaloDetDescrManager*  m_caloMgr;
 
   TTree* m_roottree;
   
@@ -85,6 +87,7 @@ private:
 
   unsigned int m_tile_n_cells;
   std::vector<float> m_tile_cell_x,m_tile_cell_y,m_tile_cell_z,m_tile_cell_Et;
+  std::vector<float> m_tile_cell_dphi,m_tile_cell_deta,m_tile_cell_dr;
   std::vector<float> m_tile_cell_eta,m_tile_cell_phi;
   std::vector<bool> m_tile_cell_bad;
   std::vector<short int> m_tile_section,m_tile_module,m_tile_tower,m_tile_sample;
@@ -126,6 +129,7 @@ private:
   
   unsigned int m_lar_n_cells;
   std::vector<float> m_lar_cell_x,m_lar_cell_y,m_lar_cell_z,m_lar_cell_Et;
+  std::vector<float> m_lar_cell_dphi,m_lar_cell_deta,m_lar_cell_dr;
   std::vector<float> m_lar_cell_eta,m_lar_cell_phi;
   std::vector<bool> m_lar_cell_bad,m_lar_is_em,m_lar_is_em_barrel,
                     m_lar_is_em_endcap,m_lar_is_em_endcap_inner,

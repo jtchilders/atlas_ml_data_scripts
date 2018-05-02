@@ -29,6 +29,8 @@ MyAlgHits::MyAlgHits(const std::string& name, ISvcLocator* pSvcLocator)
   : AthAlgorithm( name , pSvcLocator )
   , m_PixContainerName( "PixelRDOs" )
   , m_SCTContainerName( "SCT_RDOs" )
+//  , m_LArContainerName( "LArRawChannels" )
+//  , m_TileContainerName( "TileRawChannelCnt" )
   , m_rootFilename( "sihits.root" )
 {
   // Properties go here
@@ -309,7 +311,7 @@ StatusCode MyAlgHits::GetHits() {
       ++pixi;
     }
   }
-  for(SCT_RDO_Container::const_iterator it=scthitCont->begin();it!=scthitCont->end() ; ++it) { // sctel ROD Loop
+  for(SCT_RDO_Container::const_iterator it=scthitCont->begin();it!=scthitCont->end() ; ++it) { // sct ROD Loop
     const InDetRawDataCollection<SCT_RDORawData>* SCTCollection(&(**it));
     int scti=0;
     for(InDetRawDataCollection<SCT_RDORawData>::const_iterator sct_itr=SCTCollection->begin(); sct_itr!=SCTCollection->end(); ++sct_itr) {
@@ -370,6 +372,47 @@ StatusCode MyAlgHits::GetHits() {
       ++scti;
     }
   }
+  /*
+  for(LAr_RDO_Container::const_iterator it=larhitCont->begin();it!=larhitCont->end() ; ++it) { // lar ROD Loop
+    const InDetRawDataCollection<LAr_RDORawData>* LArCollection(&(**it));
+    int lari=0;
+    for(InDetRawDataCollection<LAr_RDORawData>::const_iterator lar_itr=LArCollection->begin(); lar_itr!=LArCollection->end(); ++lar_itr) {
+      const HWIdentifier larID(lar_itr->identify());
+      const int rawEnergy(lar_itr->energy());
+      const int rawTime(lar_itr->time());
+      const uint16_t rawQual(lar_itr->quality());
+      const uint16_t rawProv(lar_itr->provenance());
+      CaloGain::CaloGain larGain(lar_itr->gain());
+
+      const unsigned long long larID_int = larID.get_compact();
+      const int larGain_int = (int)larGain;
+      m_larID->push_back(larID_int);
+      m_energy->push_back(rawEnergy);
+      m_time->push_back(rawTime);
+      m_qual->push_back(rawQual);
+      m_prov->push_back(rawProv);
+      m_gain->push_back(larGain_int);
+      const InDetDD::SiDetectorElement* element=m_larManager->getDetectorElement(larId);
+      if (lari==0){
+        log << MSG::DEBUG  << " LAr module center = " << element->center() << endreq;
+        log << MSG::DEBUG  << " LAr module width, length (mm) = "  << element->width()/CLHEP::mm << ", length (mm) = " << element->length()/CLHEP::mm << ", thick (mm) = " << element->thickness()/CLHEP::mm << endreq;
+      }
+      Amg::Vector2D localPos = element->rawLocalPositionOfCell(larId);
+      Amg::Vector3D globalPos = element->globalPosition(localPos);
+      log << MSG::DEBUG << " LAr Global pos " << "x (mm) = " << globalPos.x()/CLHEP::mm<< ", y (mm) = " << globalPos.y()/CLHEP::mm<< ", z (mm) = " << globalPos.z()/CLHEP::mm <<endreq;
+      log << MSG::DEBUG << " phi pitch = " << element->phiPitch()<< ", eta pitch = " << element->etaPitch() <<endreq;
+      m_lar_position_x.push_back(globalPos.x()/CLHEP::mm);
+      m_lar_position_y.push_back(globalPos.y()/CLHEP::mm);
+      m_lar_position_z.push_back(globalPos.z()/CLHEP::mm);
+      m_lar_position_phipitch.push_back(element->phiPitch()/CLHEP::degree);
+      m_lar_position_etapitch.push_back(element->etaPitch());
+      m_lar_position_thickness.push_back(element->thickness()/CLHEP::mm);
+      
+
+      ++lari;
+    }
+  }
+  */
   m_roottree->Fill();
 
   // End of execution for each event

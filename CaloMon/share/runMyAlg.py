@@ -70,7 +70,7 @@ MyAlg.jetAuxContainerName = "AntiKt4TruthJets"
 MyAlg.rootFilename = rootFilename
 
 AthenaEventLoopMgr = Service("AthenaEventLoopMgr")
-AthenaEventLoopMgr.OutputLevel = INFO
+AthenaEventLoopMgr.OutputLevel = DEBUG
 MsgSvc = Service("MessageSvc")
 MsgSvc.defaultLimit = 100000000
 MsgSvc.OutputLevel = INFO
